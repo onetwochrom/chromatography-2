@@ -6,7 +6,7 @@
     <title>色谱柱产品查询系统</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* 原有CSS样式保持不变 */
+        /* 原有CSS样式保持不变 - 与之前的完全相同 */
         * {
             margin: 0;
             padding: 0;
@@ -513,9 +513,9 @@
                 </div>
             </div>
             
-            <!-- 固定相类型/色谱柱类型/产品类型按钮 -->
+            <!-- 产品类型/固定相类型按钮（用于保护柱） -->
             <div class="phase-type-buttons" id="phaseTypeButtons">
-                <label id="phaseTypeLabel"><i class="fas fa-layer-group"></i> 选择固定相类型：</label>
+                <label id="phaseTypeLabel"><i class="fas fa-layer-group"></i> 选择产品类型：</label>
                 <div class="phase-button-group" id="phaseButtonGroup">
                     <!-- 按钮将由JavaScript动态生成 -->
                 </div>
@@ -569,7 +569,7 @@
         // 产品数据存储
         let productData = {};
         
-        // 筛选器配置 - 包含新增的保护柱
+        // 筛选器配置 - 修正保护柱配置
         const filterConfigs = {
             "液相分析柱": [
                 { id: "fixedPhase", label: "固定相类型", field: "固定相类型" },
@@ -613,8 +613,7 @@
                 { id: "particleSize", label: "粒径", field: "粒径" },
                 { id: "quantity", label: "数量", field: "数量" }
             ],
-            "保护柱": [  // 新增的保护柱配置
-                { id: "productType", label: "产品类型", field: "产品类型" },
+            "保护柱": [  // 修正的保护柱配置
                 { id: "fixedPhase", label: "固定相类型", field: "固定相类型" },
                 { id: "particleSize", label: "粒径(μm)", field: "粒径μm" },
                 { id: "innerDiameter", label: "内径(mm)", field: "内径mm" },
@@ -624,9 +623,13 @@
 
         // 需要显示为按钮的字段类型
         const phaseTypeFields = {
-            "固定相类型": "固定相类型",
-            "色谱柱类型": "色谱柱类型",
-            "产品类型": "产品类型"  // 新增：保护柱使用"产品类型"字段作为相位类型
+            "液相分析柱": "固定相类型",
+            "SPE": "固定相类型",
+            "UHPLC柱": "固定相类型",
+            "液相制备柱": "固定相类型",
+            "色谱填料": "固定相类型",
+            "气相毛细柱": "色谱柱类型",
+            "保护柱": "产品类型"  // 保护柱使用"产品类型"字段作为第一行按钮
         };
 
         // DOM元素
@@ -774,24 +777,21 @@
             filterSection.style.display = 'block';
             resultsSection.style.display = 'block';
             
-            // 检查该产品类型的相位类型字段
-            const config = filterConfigs[productType] || [];
-            currentPhaseTypeField = '';
-            
-            // 查找是否有需要显示为按钮的字段
-            for (const [fieldName, displayName] of Object.entries(phaseTypeFields)) {
-                const hasField = config.some(filter => filter.field === fieldName);
-                if (hasField) {
-                    currentPhaseTypeField = fieldName;
-                    break;
-                }
-            }
+            // 检查该产品类型是否需要显示相位类型按钮
+            currentPhaseTypeField = phaseTypeFields[productType] || '';
             
             if (currentPhaseTypeField) {
                 phaseTypeButtons.style.display = 'block';
                 // 更新标签文本
-                const displayName = phaseTypeFields[currentPhaseTypeField];
-                phaseTypeLabel.innerHTML = `<i class="fas fa-layer-group"></i> 选择${displayName}：`;
+                let displayText = '';
+                if (productType === '保护柱') {
+                    displayText = '选择产品类型：';
+                } else if (productType === '气相毛细柱') {
+                    displayText = '选择色谱柱类型：';
+                } else {
+                    displayText = '选择固定相类型：';
+                }
+                phaseTypeLabel.innerHTML = `<i class="fas fa-layer-group"></i> ${displayText}`;
                 
                 // 获取该产品类型的相位类型
                 getPhaseTypes(productType, currentPhaseTypeField);
@@ -807,7 +807,7 @@
             updateResults();
         }
 
-        // 获取相位类型（固定相类型或色谱柱类型或产品类型）
+        // 获取相位类型
         function getPhaseTypes(productType, fieldName) {
             const data = productData[productType] || [];
             availablePhaseTypes = [...new Set(data.map(item => item[fieldName]))].filter(v => v);
@@ -867,7 +867,10 @@
             const config = filterConfigs[productType] || [];
             
             config.forEach(filter => {
-                // 跳过相位类型字段，因为我们已经用按钮处理了
+                // 对于保护柱，跳过"产品类型"字段，因为我们已经用按钮处理了
+                if (productType === '保护柱' && filter.field === '产品类型') return;
+                
+                // 对于其他类型，跳过相位类型字段
                 if (filter.field === currentPhaseTypeField) return;
                 
                 createFilterSelect(filter);
@@ -947,8 +950,11 @@
             
             // 为每个筛选器更新选项
             config.forEach(filter => {
-                // 跳过相位类型字段（我们已经用按钮处理了）
+                // 跳过相位类型字段（对于保护柱是"产品类型"，对于其他是相位类型字段）
                 if (filter.field === currentPhaseTypeField) return;
+                
+                // 对于保护柱，跳过"产品类型"字段
+                if (currentProductType === '保护柱' && filter.field === '产品类型') return;
                 
                 const select = document.getElementById(filter.id);
                 if (!select) return;

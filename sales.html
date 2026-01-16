@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>色谱柱产品查询系统</title>
-    <!-- 修改这里：使用国内CDN -->
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* 原有CSS样式保持不变 */
         * {
             margin: 0;
             padding: 0;
@@ -513,7 +513,7 @@
                 </div>
             </div>
             
-            <!-- 固定相类型/色谱柱类型按钮 -->
+            <!-- 固定相类型/色谱柱类型/产品类型按钮 -->
             <div class="phase-type-buttons" id="phaseTypeButtons">
                 <label id="phaseTypeLabel"><i class="fas fa-layer-group"></i> 选择固定相类型：</label>
                 <div class="phase-button-group" id="phaseButtonGroup">
@@ -554,7 +554,7 @@
         
         <!-- 页脚 -->
         <div class="footer">
-            <p>© 2023 色谱柱产品查询系统 | 销售查询版</p>
+            <p>© 2026 色谱柱产品查询系统 | 销售查询版</p>
             <p>数据来源：data.json | 最后更新：<span id="updateTime">未知</span></p>
             <div class="stats-info" id="statsInfo">
                 <!-- 统计信息将动态生成 -->
@@ -569,7 +569,7 @@
         // 产品数据存储
         let productData = {};
         
-        // 筛选器配置 - 更新为六大分类
+        // 筛选器配置 - 包含新增的保护柱
         const filterConfigs = {
             "液相分析柱": [
                 { id: "fixedPhase", label: "固定相类型", field: "固定相类型" },
@@ -612,13 +612,21 @@
                 { id: "poreSize", label: "孔径", field: "孔径" },
                 { id: "particleSize", label: "粒径", field: "粒径" },
                 { id: "quantity", label: "数量", field: "数量" }
+            ],
+            "保护柱": [  // 新增的保护柱配置
+                { id: "productType", label: "产品类型", field: "产品类型" },
+                { id: "fixedPhase", label: "固定相类型", field: "固定相类型" },
+                { id: "particleSize", label: "粒径(μm)", field: "粒径μm" },
+                { id: "innerDiameter", label: "内径(mm)", field: "内径mm" },
+                { id: "length", label: "长度(mm)", field: "长度mm" }
             ]
         };
 
-        // 需要显示为按钮的字段类型（固定相类型/色谱柱类型）
+        // 需要显示为按钮的字段类型
         const phaseTypeFields = {
             "固定相类型": "固定相类型",
-            "色谱柱类型": "色谱柱类型"
+            "色谱柱类型": "色谱柱类型",
+            "产品类型": "产品类型"  // 新增：保护柱使用"产品类型"字段作为相位类型
         };
 
         // DOM元素
@@ -799,7 +807,7 @@
             updateResults();
         }
 
-        // 获取相位类型（固定相类型或色谱柱类型）
+        // 获取相位类型（固定相类型或色谱柱类型或产品类型）
         function getPhaseTypes(productType, fieldName) {
             const data = productData[productType] || [];
             availablePhaseTypes = [...new Set(data.map(item => item[fieldName]))].filter(v => v);
@@ -1150,7 +1158,7 @@
             // 2秒后恢复按钮状态
             setTimeout(() => {
                 button.innerHTML = originalHTML;
-                button.classList.remove('copiled');
+                button.classList.remove('copied');
             }, 2000);
             
             // 3秒后隐藏提示

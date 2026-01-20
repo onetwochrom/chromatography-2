@@ -283,6 +283,21 @@
             font-weight: bold;
         }
         
+        .sales-price {
+            color: #27ae60;
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .sales-price-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        
         .product-details {
             margin-bottom: 15px;
         }
@@ -384,6 +399,37 @@
             margin-top: 10px;
         }
         
+        /* 新增：价格对比样式 */
+        .price-comparison {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .price-label {
+            color: #495057;
+            font-weight: bold;
+        }
+        
+        .market-price-value {
+            color: #e74c3c;
+            text-decoration: line-through;
+            opacity: 0.8;
+        }
+        
+        .sales-price-value {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
         /* 隐藏的文本区域用于复制 */
         .copy-textarea {
             position: absolute;
@@ -472,6 +518,16 @@
                 left: 10px;
                 right: 10px;
                 transform: none;
+            }
+            
+            .product-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .sales-price {
+                align-items: flex-start;
             }
         }
     </style>
@@ -1065,28 +1121,47 @@
                 </div>`;
         }
 
-        // 创建产品卡片
+        // 创建产品卡片（已修改添加一线销售价）
         function createProductCard(product) {
             const card = document.createElement('div');
             card.className = 'product-card';
             
             const marketPrice = product['市场价'] || '价格待定';
+            const salesPrice = product['一线销售价'] || '咨询报价';  // 新增一线销售价
             const productCode = product['货号'] || '无货号';
             const description = product['描述'] || '无描述信息';
             
             card.innerHTML = `
                 <div class="product-header">
-                    <span class="product-price">¥${marketPrice}</span>
+                    <div>
+                        <div class="product-price">¥${marketPrice}</div>
+                        <div style="font-size: 12px; color: #666;">市场价</div>
+                    </div>
+                    <div class="sales-price">
+                        ¥${salesPrice}
+                        <span class="sales-price-label">一线销售价</span>
+                    </div>
                 </div>
+                
                 <div class="product-details">
                     <div class="detail-row">
                         <span class="detail-label">货号：</span>
                         <span class="product-code">${productCode}</span>
                     </div>
+                    <div class="detail-row">
+                        <span class="detail-label">市场价：</span>
+                        <span>¥${marketPrice}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">销售价：</span>
+                        <span style="color: #27ae60; font-weight: bold;">¥${salesPrice}</span>
+                    </div>
                 </div>
+                
                 <div class="product-description">
                     ${description}
                 </div>
+                
                 <div class="product-actions">
                     <button class="copy-btn" data-product='${JSON.stringify(product).replace(/'/g, "&#39;")}'>
                         <i class="far fa-copy"></i> 复制信息
@@ -1103,13 +1178,18 @@
             return card;
         }
 
-        // 复制产品信息
+        // 复制产品信息（已修改包含一线销售价）
         function copyProductInfo(product, button) {
             const marketPrice = product['市场价'] || '价格待定';
+            const salesPrice = product['一线销售价'] || '咨询报价';  // 新增
             const productCode = product['货号'] || '无货号';
             const description = product['描述'] || '无描述信息';
             
-            const textToCopy = `货号：${productCode}\n价格：¥${marketPrice}\n描述：${description}`;
+            // 更新复制文本内容，包含一线销售价
+            const textToCopy = `货号：${productCode}
+市场价：¥${marketPrice}
+一线销售价：¥${salesPrice}
+描述：${description}`;
             
             // 使用更兼容的复制方法
             copyTextarea.value = textToCopy;

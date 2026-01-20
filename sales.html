@@ -1127,7 +1127,7 @@
             card.className = 'product-card';
             
             const marketPrice = product['市场价'] || '价格待定';
-            const salesPrice = product['销售价'] || '咨询报价';  // 新增销售价
+            const salesPrice = product['销售价'] || product['销售价格'] || product['sales_price'] || '咨询报价';  // 尝试多个字段名
             const productCode = product['货号'] || '无货号';
             const description = product['描述'] || '无描述信息';
             
@@ -1181,7 +1181,7 @@
         // 复制产品信息（已修改包含销售价）
         function copyProductInfo(product, button) {
             const marketPrice = product['市场价'] || '价格待定';
-            const salesPrice = product['销售价'] || '咨询报价';  // 新增
+            const salesPrice = product['销售价'] || product['销售价格'] || product['sales_price'] || '咨询报价';  // 尝试多个字段名
             const productCode = product['货号'] || '无货号';
             const description = product['描述'] || '无描述信息';
             

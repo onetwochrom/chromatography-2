@@ -665,8 +665,8 @@
             "色谱填料": [
                 { id: "fixedPhase", label: "固定相类型", field: "固定相类型" },
                 { id: "model", label: "型号", field: "型号" },
-                { id: "poreSize", label: "孔径", field: "孔径" },
-                { id: "particleSize", label: "粒径", field: "粒径" },
+                { id: "poreSize", label: "孔径(Å)", field: "孔径Å" },
+                { id: "particleSize", label: "粒径(μm)", field: "粒径μm" },
                 { id: "quantity", label: "数量", field: "数量" }
             ],
             "保护柱": [  // 修正的保护柱配置
@@ -1121,13 +1121,13 @@
                 </div>`;
         }
 
-        // 创建产品卡片（已修改添加一线销售价）
+        // 创建产品卡片（已修改添加销售价）
         function createProductCard(product) {
             const card = document.createElement('div');
             card.className = 'product-card';
             
             const marketPrice = product['市场价'] || '价格待定';
-            const salesPrice = product['一线销售价'] || '咨询报价';  // 新增一线销售价
+            const salesPrice = product['销售价'] || '咨询报价';  // 新增销售价
             const productCode = product['货号'] || '无货号';
             const description = product['描述'] || '无描述信息';
             
@@ -1139,7 +1139,7 @@
                     </div>
                     <div class="sales-price">
                         ¥${salesPrice}
-                        <span class="sales-price-label">一线销售价</span>
+                        <span class="sales-price-label">销售价</span>
                     </div>
                 </div>
                 
@@ -1178,17 +1178,17 @@
             return card;
         }
 
-        // 复制产品信息（已修改包含一线销售价）
+        // 复制产品信息（已修改包含销售价）
         function copyProductInfo(product, button) {
             const marketPrice = product['市场价'] || '价格待定';
-            const salesPrice = product['一线销售价'] || '咨询报价';  // 新增
+            const salesPrice = product['销售价'] || '咨询报价';  // 新增
             const productCode = product['货号'] || '无货号';
             const description = product['描述'] || '无描述信息';
             
-            // 更新复制文本内容，包含一线销售价
+            // 更新复制文本内容，包含销售价
             const textToCopy = `货号：${productCode}
 市场价：¥${marketPrice}
-一线销售价：¥${salesPrice}
+销售价：¥${salesPrice}
 描述：${description}`;
             
             // 使用更兼容的复制方法
